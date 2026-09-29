@@ -5,9 +5,10 @@ interface Props {
   content: NoteItemContent;
   mode: ScrapbookMode;
   isSelected?: boolean;
+  onChange?: (text: string) => void;
 }
 
-export const StickyNote: React.FC<Props> = ({ content, mode, isSelected }) => {
+export const StickyNote: React.FC<Props> = ({ content, mode, isSelected, onChange }) => {
   const isPhysical = mode === 'physical';
 
   const getColorClasses = () => {
@@ -31,9 +32,13 @@ export const StickyNote: React.FC<Props> = ({ content, mode, isSelected }) => {
         <div className="pushpin pushpin-red -top-2.5 left-1/2 -translate-x-1/2 pointer-events-none" />
       )}
 
-      <p className="font-handwriting text-sm leading-snug pt-1 whitespace-pre-wrap">
-        {content.text}
-      </p>
+      <textarea
+        aria-label="Editable note"
+        value={content.text}
+        onChange={(event) => onChange?.(event.target.value)}
+        onPointerDown={(event) => event.stopPropagation()}
+        className="w-full min-h-20 resize-none bg-transparent font-handwriting text-sm leading-snug pt-1 whitespace-pre-wrap outline-none"
+      />
     </div>
   );
 };

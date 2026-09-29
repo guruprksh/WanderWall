@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTravelStore } from '../../store/travelStore';
 import { CanvasControls } from './CanvasControls';
 import { PhotoCard } from '../cards/PhotoCard';
@@ -21,11 +21,46 @@ export const ScrapbookCanvas: React.FC<Props> = ({ tripId }) => {
   const [bgTexture, setBgTexture] = useState('dots');
   const [showAddModal, setShowAddModal] = useState(false);
   const [copiedAlert, setCopiedAlert] = useState(false);
+  const [clipboardItem, setClipboardItem] = useState<any>(null);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const draggingItem = useRef<{ id: string; startX: number; startY: number; initX: number; initY: number } | null>(null);
 
   const tripItems = canvasItems.filter((item) => item.tripId === tripId);
+
+  useEffect(() => {
+    const onKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement;
+      if (target.isContentEditable || ['INPUT', 'TEXTAREA'].includes(target.tagName)) return;
+      const selected = canvasItems.find((item) => item.id === selectedId);
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'c' && selected) {
+        event.preventDefault();
+        setClipboardItem(selected);
+        setCopiedAlert(true);
+        setTimeout(() => setCopiedAlert(false), 1800);
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'x' && selected) {
+        event.preventDefault();
+        setClipboardItem(selected);
+        useTravelStore.getState().deleteCanvasItem(selected.id);
+        setSelectedId(null);
+      }
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'v' && clipboardItem) {
+        event.preventDefault();
+        const itemData = { ...clipboardItem };
+        delete itemData.id;
+        delete itemData.zIndex;
+        addCanvasItem({ ...itemData, x: clipboardItem.x + 30, y: clipboardItem.y + 30, rotation: clipboardItem.rotation + 2 });
+      }
+      if ((event.key === 'Backspace' || event.key === 'Delete') && selected) {
+        event.preventDefault();
+        useTravelStore.getState().deleteCanvasItem(selected.id);
+        setSelectedId(null);
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [addCanvasItem, canvasItems, clipboardItem, selectedId]);
 
   const handlePointerDown = (e: React.PointerEvent, item: any) => {
     e.stopPropagation();
@@ -74,7 +109,7 @@ export const ScrapbookCanvas: React.FC<Props> = ({ tripId }) => {
       case 'memory':
         return <MemoryCard content={item.content} mode={scrapbookMode} isSelected={isSelected} />;
       case 'note':
-        return <StickyNote content={item.content} mode={scrapbookMode} isSelected={isSelected} />;
+        return <StickyNote content={item.content} mode={scrapbookMode} isSelected={isSelected} onChange={(text) => updateCanvasItem(item.id, { content: { ...item.content, text } })} />;
       case 'stamp':
         return <StampBadge content={item.content} isSelected={isSelected} />;
       case 'sticker':
@@ -90,7 +125,7 @@ export const ScrapbookCanvas: React.FC<Props> = ({ tripId }) => {
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}
       onClick={() => setSelectedId(null)}
-      className={`relative w-full h-[calc(100vh-140px)] min-h-[600px] overflow-auto select-none rounded-2xl border border-stone-300 shadow-inner ${
+      className={`relative w-full min-h-[520px] h-[calc(100svh-140px)] md:aspect-[16/10] md:h-auto max-h-[900px] overflow-auto select-none rounded-2xl border border-stone-300 shadow-inner ${
         bgTexture === 'corkboard' ? 'canvas-corkboard' : bgTexture === 'dots' ? 'bg-[#F7F4EE] canvas-grid-dots' : 'bg-[#FAF8F5]'
       }`}
     >
@@ -108,7 +143,7 @@ export const ScrapbookCanvas: React.FC<Props> = ({ tripId }) => {
       {/* Share Toast */}
       {copiedAlert && (
         <div className="absolute top-4 right-4 z-40 bg-stone-900 text-white text-xs px-4 py-2 rounded-full shadow-lg">
-          ✨ Shareable link copied to clipboard!
+          ✨ Copied — use ⌘/Ctrl+V to paste on this canvas.
         </div>
       )}
 
