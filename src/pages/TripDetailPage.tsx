@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import React from 'react';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import { useTravelStore } from '../store/travelStore';
 import { TripHeader } from '../components/trip/TripHeader';
 import { ScrapbookCanvas } from '../components/canvas/ScrapbookCanvas';
@@ -12,7 +12,9 @@ import { TripDocuments } from '../components/trip/TripDocuments';
 export const TripDetailPage: React.FC = () => {
   const { tripId, tab } = useParams<{ tripId: string; tab?: string }>();
   const { trips } = useTravelStore();
-  const [activeTab, setActiveTab] = useState(tab || 'canvas');
+  const navigate = useNavigate();
+  const availableTabs = ['canvas', 'timeline', 'map', 'diary', 'moodboard', 'documents'];
+  const activeTab = tab && availableTabs.includes(tab) ? tab : 'canvas';
 
   const trip = trips.find((t) => t.id === tripId);
 
@@ -22,7 +24,11 @@ export const TripDetailPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-[#F7F4EE] flex flex-col">
-      <TripHeader trip={trip} activeTab={activeTab} setActiveTab={setActiveTab} />
+      <TripHeader
+        trip={trip}
+        activeTab={activeTab}
+        setActiveTab={(nextTab) => navigate(`/trip/${trip.id}/${nextTab}`)}
+      />
 
       <main className="flex-1 p-4 md:p-6">
         {activeTab === 'canvas' && <ScrapbookCanvas tripId={trip.id} />}

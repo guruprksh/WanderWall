@@ -34,7 +34,7 @@ export const TripHeader: React.FC<Props> = ({ trip, activeTab, setActiveTab }) =
     <>
       <div className="bg-[#FAF7F2] border-b border-stone-200">
         {/* Cover Banner */}
-        <div className="relative h-64 md:h-80 overflow-hidden bg-stone-900">
+        <div className="relative h-56 sm:h-64 md:h-80 lg:h-[22rem] overflow-hidden bg-stone-900">
           <img
             src={trip.coverPhoto}
             alt={trip.title}
@@ -43,13 +43,13 @@ export const TripHeader: React.FC<Props> = ({ trip, activeTab, setActiveTab }) =
           <div className="absolute inset-0 bg-gradient-to-t from-stone-950/80 via-stone-950/30 to-transparent" />
 
           {/* Top-right actions */}
-          <div className="absolute top-4 right-4 flex items-center space-x-2 z-10">
+          <div className="absolute top-3 right-3 sm:top-4 sm:right-4 flex items-center gap-2 z-10">
             <button
               onClick={() => setShowStoryModal(true)}
               className="flex items-center space-x-1.5 px-3.5 py-1.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white text-xs font-bold rounded-full shadow-lg hover:brightness-110 transition-all hover:scale-105"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-200" />
-              <span>Turn into Story</span>
+              <span className="hidden sm:inline">Turn into Story</span>
             </button>
             <button
               onClick={cycleCoverStyle}

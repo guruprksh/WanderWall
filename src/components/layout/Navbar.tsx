@@ -63,8 +63,8 @@ export const Navbar: React.FC = () => {
               </div>
             </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
+            {/* Desktop Navigation: available once the header has room for its actions. */}
+            <nav aria-label="Primary navigation" className="hidden xl:flex items-center space-x-1">
               {navLinks.map((item) => {
                 const Icon = item.icon;
                 return (
@@ -88,11 +88,11 @@ export const Navbar: React.FC = () => {
             </nav>
 
             {/* Right Controls */}
-            <div className="flex items-center space-x-2 sm:space-x-2.5">
+            <div className="flex items-center space-x-1.5 sm:space-x-2">
               {/* Turn Trip into Story Button */}
               <button
                 onClick={() => setShowStoryGen(true)}
-                className="flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-full text-xs font-bold hover:brightness-105 shadow-sm transition-all hover:scale-105"
+                className="hidden sm:flex items-center space-x-1 px-3 py-1.5 bg-gradient-to-r from-amber-600 to-amber-700 text-white rounded-full text-xs font-bold hover:brightness-105 shadow-sm transition-all hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500 focus-visible:ring-offset-2"
                 title="Turn My Trip into a Story"
               >
                 <span>✨</span>
@@ -103,7 +103,7 @@ export const Navbar: React.FC = () => {
               <button
                 onClick={() => setScrapbookMode(scrapbookMode === 'physical' ? 'clean' : 'physical')}
                 title="Toggle between Physical Scrapbook & Clean Digital"
-                className={`flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
+                className={`hidden sm:flex items-center space-x-1.5 px-3 py-1 rounded-full text-xs font-semibold border transition-all ${
                   scrapbookMode === 'physical'
                     ? 'bg-amber-800 text-amber-50 border-amber-900 shadow-sm'
                     : 'bg-stone-100 text-stone-700 border-stone-300 hover:bg-stone-200'
@@ -118,7 +118,7 @@ export const Navbar: React.FC = () => {
               {/* AI Travel Assistant Button */}
               <button
                 onClick={() => setShowAI(true)}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-stone-100 text-stone-800 hover:bg-stone-200 rounded-full text-xs font-medium border border-stone-300 transition-all"
+                className="hidden md:flex items-center space-x-1.5 px-2.5 py-1.5 bg-stone-100 text-stone-800 hover:bg-stone-200 rounded-full text-xs font-medium border border-stone-300 transition-all"
                 title="Ask AI Travel Assistant"
               >
                 <Sparkles className="w-3.5 h-3.5 text-amber-600" />
@@ -128,7 +128,7 @@ export const Navbar: React.FC = () => {
               {/* Google Drive Cloud Backup Button */}
               <button
                 onClick={() => setShowDrive(true)}
-                className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-white/80 hover:bg-emerald-50 text-stone-700 hover:text-emerald-900 rounded-full text-xs font-medium border border-stone-200 hover:border-emerald-300 transition-all shadow-sm group"
+                className="hidden lg:flex items-center space-x-1.5 px-2.5 py-1.5 bg-white/80 hover:bg-emerald-50 text-stone-700 hover:text-emerald-900 rounded-full text-xs font-medium border border-stone-200 hover:border-emerald-300 transition-all shadow-sm group"
                 title="Google Drive Cloud Vault & Auto-Backup"
               >
                 <Cloud className={`w-3.5 h-3.5 ${driveSync.isConnected ? 'text-emerald-600' : 'text-stone-400'}`} />
@@ -169,6 +169,28 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Mobile and tablet navigation remains discoverable instead of being hidden. */}
+      <nav aria-label="Primary navigation" className="xl:hidden sticky top-16 z-30 border-b border-[#E6DEC8] bg-[#FAF7F2]/95 backdrop-blur-md">
+        <div className="flex gap-1 overflow-x-auto px-3 py-2 scrollbar-none">
+          {navLinks.map((item) => {
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                end={item.exact}
+                className={({ isActive }) => `flex shrink-0 items-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-600 ${
+                  isActive ? 'bg-amber-700 text-white shadow-sm' : 'text-stone-700 hover:bg-amber-100'
+                }`}
+              >
+                <Icon className="h-3.5 w-3.5" />
+                <span>{item.label}</span>
+              </NavLink>
+            );
+          })}
+        </div>
+      </nav>
 
       {/* Traveler Profile Modal */}
       {showAuth && <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />}
