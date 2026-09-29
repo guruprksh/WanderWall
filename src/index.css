@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-[#F7F4EE] text-ink antialiased selection:bg-amber-200 selection:text-amber-900;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Scrapbook Special Effects */
+.washi-tape {
+  position: absolute;
+  height: 22px;
+  background-color: rgba(235, 222, 192, 0.75);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+  backdrop-filter: blur(1px);
+  z-index: 10;
+  border-left: 2px dashed rgba(180, 160, 130, 0.4);
+  border-right: 2px dashed rgba(180, 160, 130, 0.4);
+}
+
+.washi-tape-coral {
+  background-color: rgba(240, 160, 140, 0.7);
+}
+
+.washi-tape-sage {
+  background-color: rgba(180, 205, 175, 0.7);
+}
+
+.washi-tape-navy {
+  background-color: rgba(160, 185, 215, 0.7);
+}
+
+.washi-tape-gold {
+  background-color: rgba(238, 204, 130, 0.7);
+}
+
+.pushpin {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.4), inset -1px -1px 3px rgba(0,0,0,0.3), inset 1px 1px 3px rgba(255,255,255,0.7);
+  z-index: 20;
+}
+
+.pushpin-red {
+  background: radial-gradient(circle at 35% 35%, #ff6b6b, #c92a2a 70%);
+}
+
+.pushpin-brass {
+  background: radial-gradient(circle at 35% 35%, #ffd43b, #b19702 70%);
+}
+
+.pushpin-blue {
+  background: radial-gradient(circle at 35% 35%, #4dabf7, #1864ab 70%);
+}
+
+.pushpin-green {
+  background: radial-gradient(circle at 35% 35%, #69db7c, #2b8a3e 70%);
+}
+
+.torn-paper {
+  background: #fdfcf7;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.08));
+  position: relative;
+}
+
+.stamp-badge {
+  border: 2px dashed #b94a48;
+  color: #b94a48;
+  font-family: 'Playfair Display', Georgia, serif;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transform: rotate(-8deg);
+  opacity: 0.85;
+  mix-blend-mode: multiply;
+}
+
+.stamp-green {
+  border-color: #2b8a3e;
+  color: #2b8a3e;
+}
+
+.stamp-navy {
+  border-color: #1971c2;
+  color: #1971c2;
+}
+
+.polaroid-frame {
+  background: #ffffff;
+  padding: 10px 10px 32px 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.12), 0 1px 3px rgba(0,0,0,0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.polaroid-frame:hover {
+  box-shadow: 0 12px 30px rgba(0,0,0,0.18), 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #d4c5b9;
+  border-radius: 9999px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #b5a496;
+}
+
+/* Dot grid for canvas background */
+.canvas-grid-dots {
+  background-image: radial-gradient(#d6cdc3 1.2px, transparent 1.2px);
+  background-size: 24px 24px;
+}
+
+.canvas-corkboard {
+  background-color: #d8b488;
+  background-image: 
+    radial-gradient(#b89063 15%, transparent 16%),
+    radial-gradient(#b89063 15%, transparent 16%);
+  background-size: 30px 30px;
+  background-position: 0 0, 15px 15px;
+}

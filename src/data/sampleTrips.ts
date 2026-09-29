@@ -1,0 +1,67 @@
+import { Trip } from '../types/travel';
+import { photos } from './photos';
+
+const av = 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guru';
+
+export const sampleTrips: Trip[] = [
+  {
+    id: 'trip-italy-2026', title: 'Italy 2026', destination: 'Italy',
+    dates: { start: '2026-05-12', end: '2026-05-24' }, year: 2026,
+    coverPhoto: photos.rome, coverStyle: 'large',
+    description: 'Three magical weeks driving through Tuscany and eating our weight in gelato.',
+    weather: '☀️ Sunny & warm', distanceKm: 1450,
+    countries: ['Italy'], cities: ['Rome', 'Florence', 'Venice', 'Siena', 'Cinque Terre'],
+    placesCount: 38, routePreview: ['Rome', 'Florence', 'Siena', 'Cinque Terre', 'Venice'],
+    collaborators: [{ name: 'Guru', avatar: av, role: 'Owner' }],
+    tags: ['art', 'food', 'road-trip'], moodPalette: ['#e3a857', '#b94a48', '#3d5a80', '#f4ede4'],
+    createdAt: '2026-04-01', status: 'completed',
+  },
+  {
+    id: 'trip-paris-2026', title: 'Weekend in Paris', destination: 'France',
+    dates: { start: '2026-06-12', end: '2026-06-14' }, year: 2026,
+    coverPhoto: photos.paris, coverStyle: 'polaroid',
+    description: 'Croissants, the Louvre, and golden evenings by the Seine.',
+    weather: '🌤️ Warm breeze', distanceKm: 430,
+    countries: ['France'], cities: ['Paris'],
+    placesCount: 12, routePreview: ['Amsterdam', 'Paris'],
+    collaborators: [{ name: 'Guru', avatar: av, role: 'Owner' }],
+    tags: ['romantic', 'city-break', 'art'], moodPalette: ['#1d3557', '#e63946', '#f1faee', '#a8dadc'],
+    createdAt: '2026-05-30', status: 'completed',
+  },
+  {
+    id: 'trip-japan-2025', title: 'Japan Adventure', destination: 'Japan',
+    dates: { start: '2025-03-28', end: '2025-04-10' }, year: 2025,
+    coverPhoto: photos.japan, coverStyle: 'grid',
+    description: 'Cherry blossoms, bullet trains, ramen at midnight, temple sunrises.',
+    weather: '🌸 Spring', distanceKm: 2300,
+    countries: ['Japan'], cities: ['Tokyo', 'Kyoto', 'Osaka', 'Hakone', 'Nara'],
+    placesCount: 52, routePreview: ['Tokyo', 'Hakone', 'Kyoto', 'Nara', 'Osaka'],
+    collaborators: [{ name: 'Guru', avatar: av, role: 'Owner' }],
+    tags: ['culture', 'food', 'nature'], moodPalette: ['#d6336c', '#f8f0fc', '#2b8a3e', '#343a40'],
+    createdAt: '2025-02-01', status: 'completed',
+  },
+  {
+    id: 'trip-salzburg-2024', title: 'Weekend in Salzburg', destination: 'Austria',
+    dates: { start: '2024-12-18', end: '2024-12-21' }, year: 2024,
+    coverPhoto: photos.salzburg, coverStyle: 'minimal',
+    description: 'Christmas markets, snowy peaks, and warm Apfelstrudel.',
+    weather: '❄️ Cold & snowy', distanceKm: 290,
+    countries: ['Austria'], cities: ['Salzburg', 'Hallstatt'],
+    placesCount: 16, routePreview: ['Salzburg', 'Hallstatt'],
+    collaborators: [{ name: 'Guru', avatar: av, role: 'Owner' }],
+    tags: ['winter', 'christmas'], moodPalette: ['#495057', '#e9ecef', '#c2255c', '#2b8a3e'],
+    createdAt: '2024-11-20', status: 'completed',
+  },
+  {
+    id: 'trip-southfrance-2026', title: 'South of France', destination: 'France',
+    dates: { start: '2026-07-02', end: '2026-07-15' }, year: 2026,
+    coverPhoto: photos.nice, coverStyle: 'scrapbook',
+    description: 'Lavender fields, rosé, and lazy days along the Côte d\'Azur.',
+    weather: '☀️ Hot & sunny', distanceKm: 980,
+    countries: ['France'], cities: ['Lyon', 'Marseille', 'Nice', 'Avignon'],
+    placesCount: 28, routePreview: ['Paris', 'Lyon', 'Avignon', 'Marseille', 'Nice'],
+    collaborators: [{ name: 'Guru', avatar: av, role: 'Owner' }],
+    tags: ['beach', 'wine', 'road-trip'], moodPalette: ['#228be6', '#f59f00', '#e8590c', '#f4ede4'],
+    createdAt: '2026-06-20', status: 'completed',
+  },
+];
