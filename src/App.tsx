@@ -12,6 +12,7 @@ import { MuseumPage } from './pages/MuseumPage';
 import { StatsPage } from './pages/StatsPage';
 import { StoriesArchivePage } from './pages/StoriesArchivePage';
 import { StoryViewPage } from './pages/StoryViewPage';
+import { PrintPreviewPage } from './pages/PrintPreviewPage';
 
 export const App: React.FC = () => {
   return (
@@ -32,6 +33,7 @@ export const App: React.FC = () => {
             <Route path="/stats" element={<StatsPage />} />
             <Route path="/stories" element={<StoriesArchivePage />} />
             <Route path="/story/:storyId" element={<StoryViewPage />} />
+            <Route path="/print/:storyId" element={<PrintPreviewPage />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </main>

@@ -6,30 +6,56 @@ export const generateAnnualTravelStory = (
   trips: Trip[],
   uniquePhotos: string[]
 ): TravelStory => {
+  return generateCollectionTravelStory({
+    title: `MY ${year} IN TRAVEL`,
+    subtitle: `${trips.length} Journeys across ${Array.from(new Set(trips.flatMap((trip) => trip.countries || [trip.destination]))).length} Countries`,
+    trips,
+    coverPhoto: uniquePhotos[0],
+    year,
+  });
+};
+
+export interface CollectionStoryOptions {
+  title: string;
+  subtitle?: string;
+  trips: Trip[];
+  coverPhoto?: string;
+  year?: number;
+}
+
+export const generateCollectionTravelStory = ({
+  title,
+  subtitle,
+  trips,
+  coverPhoto,
+  year,
+}: CollectionStoryOptions): TravelStory => {
+  const uniquePhotos = Array.from(new Set(trips.flatMap((trip) => trip.photos?.length ? trip.photos : [trip.coverPhoto])));
+  const collectionYear = year || trips[0]?.year || new Date().getFullYear();
   const totalKm = trips.reduce((acc, t) => acc + (t.distanceKm || 0), 0);
   const countries = Array.from(new Set(trips.flatMap((t) => t.countries || [t.destination])));
   const allCities = trips.flatMap((t) => t.cities);
-  const coverImg = trips[0]?.coverPhoto || uniquePhotos[0] || '';
+  const coverImg = coverPhoto || trips[0]?.coverPhoto || uniquePhotos[0] || '';
 
   const pages: StoryPage[] = [
     {
-      id: 'annual-cover',
+      id: 'collection-cover',
       pageNumber: 1,
       type: 'cover',
-      title: `MY ${year} IN TRAVEL`,
-      subtitle: `${trips.length} Journeys • ${countries.length} Countries • ${allCities.length} Cities`,
+      title,
+      subtitle: subtitle || `${trips.length} Journeys • ${countries.length} Countries • ${allCities.length} Cities`,
       content: {
-        introText: `A definitive retrospective of wanderlust, discovery, and roads taken throughout ${year}.`,
+        introText: `A personal collection of journeys, places, and moments from ${collectionYear}.`,
         additionalText: countries.join(' · ').toUpperCase(),
       },
       photos: [coverImg],
       layoutVariant: 'cinematic_full',
     },
     {
-      id: 'annual-stats',
+      id: 'collection-stats',
       pageNumber: 2,
       type: 'stats',
-      title: `${year} By The Numbers`,
+      title: `${collectionYear} By The Numbers`,
       subtitle: 'The full record of your planetary mileage',
       content: {
         statsData: {
@@ -45,10 +71,10 @@ export const generateAnnualTravelStory = (
       photos: uniquePhotos.slice(0, 2),
     },
     {
-      id: 'annual-trips',
+      id: 'collection-trips',
       pageNumber: 3,
       type: 'route',
-      title: `The ${year} Grand Route`,
+      title: 'Your Collection Route',
       subtitle: 'Chronological expedition log',
       content: {
         routeStops: trips.map((t) => ({
@@ -62,10 +88,10 @@ export const generateAnnualTravelStory = (
       photos: uniquePhotos.slice(2, 4),
     },
     {
-      id: 'annual-moments',
+      id: 'collection-moments',
       pageNumber: 4,
       type: 'moments',
-      title: `Highlights of ${year}`,
+      title: 'Highlights from the Road',
       subtitle: 'Unforgettable moments of the year',
       content: {
         bestMoments: [
@@ -90,10 +116,10 @@ export const generateAnnualTravelStory = (
       photos: uniquePhotos.slice(0, 4),
     },
     {
-      id: 'annual-gallery',
+      id: 'collection-gallery',
       pageNumber: 5,
       type: 'gallery',
-      title: `${year} Visual Retrospective`,
+      title: 'Visual Retrospective',
       subtitle: 'A mosaic of places and horizons',
       content: {
         galleryLayout: 'polaroid_wall',
@@ -101,13 +127,13 @@ export const generateAnnualTravelStory = (
       photos: uniquePhotos.slice(0, 6),
     },
     {
-      id: 'annual-closing',
+      id: 'collection-closing',
       pageNumber: 6,
       type: 'closing',
-      title: `${year} IN ONE JOURNEY`,
+      title: 'THE JOURNEY, KEPT',
       subtitle: 'Here’s to the next horizon',
       content: {
-        closingMessage: `Twelve months, ${trips.length} major expeditions, and a lifetime of shared laughter across ${countries.join(', ')}. Until the next departure gate.`,
+        closingMessage: `${trips.length} journeys and a lifetime of shared moments across ${countries.join(', ')}. Until the next departure gate.`,
         favouriteMemory: `Every sunset watched from a new corner of the world.`,
       },
       photos: [trips[trips.length - 1]?.coverPhoto || uniquePhotos[0]],
@@ -115,14 +141,14 @@ export const generateAnnualTravelStory = (
   ];
 
   return {
-    id: `story-annual-${year}-${Date.now()}`,
-    isYearly: true,
+    id: `story-collection-${Date.now()}`,
+    isYearly: Boolean(year),
     yearlyYear: year,
-    title: `MY ${year} IN TRAVEL`,
-    subtitle: `${trips.length} Journeys across ${countries.length} Countries`,
-    destination: `${countries.join(', ')}`,
-    dates: `Jan — Dec ${year}`,
-    year,
+    title,
+    subtitle: subtitle || `${trips.length} Journeys across ${countries.length} Countries`,
+    destination: countries.join(', '),
+    dates: trips.length === 1 ? `${trips[0].dates.start} — ${trips[0].dates.end}` : `${trips.length} selected journeys`,
+    year: collectionYear,
     coverPhoto: coverImg,
     style: 'magazine',
     writingSettings: {

@@ -88,4 +88,4 @@ export const generateTripStory = (opts: GeneratorOptions): TravelStory => {
 };
 
 export { regeneratePageContent } from './storyHelpers';
-export { generateAnnualTravelStory } from './annualStoryHelper';
+export { generateAnnualTravelStory, generateCollectionTravelStory } from './annualStoryHelper';

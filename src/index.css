@@ -157,3 +157,25 @@
   background-size: 30px 30px;
   background-position: 0 0, 15px 15px;
 }
+
+.print-page {
+  background: white;
+  box-shadow: 0 12px 28px rgba(41, 37, 36, 0.2);
+  margin: 0 auto 2.5rem;
+  overflow: hidden;
+}
+.print-book--a4 .print-page { width: min(100%, 210mm); height: 297mm; }
+.print-book--a5 .print-page { width: min(100%, 148mm); height: 210mm; }
+.print-book--square .print-page { width: min(100%, 210mm); height: 210mm; }
+
+@media print {
+  @page { margin: 0; }
+  body { background: white !important; }
+  body::after, .no-print, body:has(.print-preview-shell) > #root > div > header { display: none !important; }
+  body:has(.print-preview-shell) > #root > div { display: block !important; background: white !important; }
+  .print-preview-shell, .print-book { background: white !important; padding: 0 !important; margin: 0 !important; }
+  .print-page { width: 100% !important; height: 100vh !important; min-height: 0 !important; margin: 0 !important; box-shadow: none !important; break-after: page; page-break-after: always; }
+  .print-page:last-child { break-after: auto; page-break-after: auto; }
+  .print-page > div { height: 100% !important; overflow: hidden !important; }
+}
+

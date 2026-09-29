@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import { useTravelStore } from '../store/travelStore';
 import { StoryGeneratorModal } from '../components/story/StoryGeneratorModal';
 import { AnnualStoryModal } from '../components/story/AnnualStoryModal';
+import { CollectionBookModal } from '../components/story/CollectionBookModal';
 
 export const StoriesArchivePage: React.FC = () => {
   const { stories, deleteStory } = useTravelStore();
   const navigate = useNavigate();
   const [isGeneratorOpen, setGeneratorOpen] = useState(false);
   const [isAnnualOpen, setAnnualOpen] = useState(false);
+  const [isCollectionOpen, setCollectionOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[#F0EAD6] p-8 -mt-16 pt-24 pb-20">
@@ -21,7 +23,13 @@ export const StoriesArchivePage: React.FC = () => {
               Your personalized digital library of travel books, editorial pieces, and memories.
             </p>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              onClick={() => setCollectionOpen(true)}
+              className="px-4 py-2 rounded-xl bg-white text-[#2C241E] border border-[#D9CEBF] text-sm font-bold shadow-sm hover:bg-[#F5EDE0] transition"
+            >
+              📚 Collection Book
+            </button>
             <button
               onClick={() => setAnnualOpen(true)}
               className="px-4 py-2 rounded-xl bg-white text-[#2C241E] border border-[#D9CEBF] text-sm font-bold shadow-sm hover:bg-[#F5EDE0] transition"
@@ -104,6 +112,7 @@ export const StoriesArchivePage: React.FC = () => {
 
       <StoryGeneratorModal isOpen={isGeneratorOpen} onClose={() => setGeneratorOpen(false)} />
       <AnnualStoryModal isOpen={isAnnualOpen} onClose={() => setAnnualOpen(false)} />
+      <CollectionBookModal isOpen={isCollectionOpen} onClose={() => setCollectionOpen(false)} />
     </div>
   );
 };
