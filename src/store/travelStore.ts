@@ -3,8 +3,39 @@ import { persist } from 'zustand/middleware';
 import { TravelStoreState } from './types';
 import { Trip, CanvasItem, TimelineDay, DiaryEntry, DreamTrip, MoodboardItem, PassportStamp } from '../types/travel';
 import { TravelStory } from '../types/story';
+import { DEFAULT_USER, UserProfile } from '../types/auth';
+import { DriveBackupItem, DriveSyncState, WanderWallFullBackup } from '../types/drive';
 import { sampleTrips, sampleCanvasItems, sampleTimeline, sampleDiary, sampleDreamTrips, sampleMoodboard, samplePassportStamps, sampleStats } from '../data/sampleData';
 import { buildSampleStories } from '../data/sampleStories';
+import { createBackupPayload, googleDriveCloudService, validateBackupPayload } from '../utils/driveBackupEngine';
+
+const initialDriveBackups: DriveBackupItem[] = [
+  {
+    id: 'backup-demo-1',
+    fileName: 'wanderwall_cloud_backup_current.json',
+    timestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+    sizeKb: 142.5,
+    tripsCount: 4,
+    storiesCount: 4,
+    canvasItemsCount: 16,
+    driveFileId: 'gdrive_demo_initial_file',
+    version: 'v4.4',
+  },
+];
+
+const initialDriveSync: DriveSyncState = {
+  isConnected: true,
+  accountEmail: 'guru.traveler@gmail.com',
+  accountName: 'Guru Prakash',
+  lastSyncTimestamp: new Date(Date.now() - 1000 * 60 * 35).toISOString(),
+  isSyncing: false,
+  autoBackup: true,
+  storageQuota: {
+    usedMb: 4.2,
+    totalMb: 15360,
+  },
+  backupList: initialDriveBackups,
+};
 
 export const useTravelStore = create<TravelStoreState>()(
   persist(
@@ -21,6 +52,152 @@ export const useTravelStore = create<TravelStoreState>()(
       scrapbookMode: 'physical',
       stories: buildSampleStories(),
       activeStoryId: 'story-italy-magazine',
+
+      // User Profile & Authentication State
+      user: DEFAULT_USER,
+      isAuthenticated: true,
+
+      login: (email: string, name?: string, avatar?: string) => {
+        const userName = name || email.split('@')[0];
+        const updatedUser: UserProfile = {
+          ...(get().user || DEFAULT_USER),
+          id: `user-${Date.now()}`,
+          name: userName.charAt(0).toUpperCase() + userName.slice(1),
+          email,
+          avatar: avatar || (get().user?.avatar || DEFAULT_USER.avatar),
+        };
+        set({ user: updatedUser, isAuthenticated: true });
+      },
+
+      logout: () => {
+        set({
+          user: null,
+          isAuthenticated: false,
+        });
+      },
+
+      updateUserProfile: (updates: Partial<UserProfile>) => {
+        const current = get().user || DEFAULT_USER;
+        set({ user: { ...current, ...updates } });
+      },
+
+      // Google Drive & Cloud Backup State
+      driveSync: initialDriveSync,
+
+      connectDrive: async (email: string) => {
+        set((s) => ({ driveSync: { ...s.driveSync, isSyncing: true } }));
+        try {
+          const res = await googleDriveCloudService.connectAccount(email);
+          set((s) => ({
+            driveSync: {
+              ...s.driveSync,
+              isConnected: true,
+              accountEmail: email,
+              accountName: res.accountName,
+              isSyncing: false,
+            },
+          }));
+          return true;
+        } catch {
+          set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+          return false;
+        }
+      },
+
+      disconnectDrive: () => {
+        set((s) => ({
+          driveSync: {
+            ...s.driveSync,
+            isConnected: false,
+            accountEmail: null,
+            accountName: null,
+            lastSyncTimestamp: null,
+          },
+        }));
+      },
+
+      triggerDriveBackup: async () => {
+        const state = get();
+        set((s) => ({ driveSync: { ...s.driveSync, isSyncing: true } }));
+        try {
+          const payload = createBackupPayload(state, state.driveSync.accountEmail || state.user?.email);
+          const backupItem = await googleDriveCloudService.uploadToDrive(payload);
+          set((s) => ({
+            driveSync: {
+              ...s.driveSync,
+              isSyncing: false,
+              lastSyncTimestamp: backupItem.timestamp,
+              storageQuota: {
+                ...s.driveSync.storageQuota,
+                usedMb: Math.round((s.driveSync.storageQuota.usedMb + backupItem.sizeKb / 1024) * 10) / 10,
+              },
+              backupList: [backupItem, ...s.driveSync.backupList],
+            },
+          }));
+          return backupItem;
+        } catch (e) {
+          console.error('Backup failed', e);
+          set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+          return null;
+        }
+      },
+
+      restoreDriveBackup: async (driveFileId: string) => {
+        set((s) => ({ driveSync: { ...s.driveSync, isSyncing: true } }));
+        try {
+          const payload = await googleDriveCloudService.fetchBackupFile(driveFileId);
+          if (payload && validateBackupPayload(payload).valid) {
+            get().importFullBackupPayload(payload);
+            set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+            return true;
+          }
+          if (driveFileId === 'gdrive_demo_initial_file') {
+            get().resetToSampleData();
+            set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+            return true;
+          }
+          set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+          return false;
+        } catch (e) {
+          console.error('Restore failed', e);
+          set((s) => ({ driveSync: { ...s.driveSync, isSyncing: false } }));
+          return false;
+        }
+      },
+
+      deleteDriveBackup: async (driveFileId: string) => {
+        await googleDriveCloudService.deleteBackupFromDrive(driveFileId);
+        set((s) => ({
+          driveSync: {
+            ...s.driveSync,
+            backupList: s.driveSync.backupList.filter((b) => b.driveFileId !== driveFileId),
+          },
+        }));
+        return true;
+      },
+
+      toggleAutoBackup: (enabled: boolean) => {
+        set((s) => ({
+          driveSync: { ...s.driveSync, autoBackup: enabled },
+        }));
+      },
+
+      importFullBackupPayload: (payload: WanderWallFullBackup) => {
+        const validation = validateBackupPayload(payload);
+        if (!validation.valid) return false;
+        set({
+          trips: payload.trips || [],
+          canvasItems: payload.canvasItems || [],
+          timelineDays: payload.timelineDays || [],
+          diaryEntries: payload.diaryEntries || [],
+          stories: payload.stories || [],
+          passportStamps: payload.passportStamps || [],
+          stats: payload.stats && Object.keys(payload.stats).length > 0 ? (payload.stats as any) : sampleStats,
+          activeTripId: payload.trips?.[0]?.id || null,
+          activeStoryId: payload.stories?.[0]?.id || null,
+        });
+        return true;
+      },
 
       setScrapbookMode: (mode) => set({ scrapbookMode: mode }),
       setActiveTripId: (id) => set({ activeTripId: id }),
@@ -246,7 +423,7 @@ export const useTravelStore = create<TravelStoreState>()(
       }),
     }),
     {
-      name: 'wanderwall_storage_v1',
+      name: 'wanderwall_storage_v2',
       partialize: (s) => ({
         trips: s.trips,
         canvasItems: s.canvasItems,
@@ -257,6 +434,9 @@ export const useTravelStore = create<TravelStoreState>()(
         passportStamps: s.passportStamps,
         scrapbookMode: s.scrapbookMode,
         stories: s.stories,
+        user: s.user,
+        isAuthenticated: s.isAuthenticated,
+        driveSync: s.driveSync,
       }),
     }
   )

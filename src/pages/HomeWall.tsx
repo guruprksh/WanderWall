@@ -1,28 +1,81 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Navigation, Sparkles, ArrowRight, Sun } from 'lucide-react';
+import { Navigation, Sparkles, ArrowRight, Sun, Cloud, Plus } from 'lucide-react';
 import { useTravelStore } from '../store/travelStore';
+import { AuthModal } from '../components/auth/AuthModal';
+import { DriveBackupModal } from '../components/drive/DriveBackupModal';
+import { StoryGeneratorModal } from '../components/story/StoryGeneratorModal';
+import { NewTripModal } from '../components/modals/NewTripModal';
 
 export const HomeWall: React.FC = () => {
-  const { trips, stats, scrapbookMode } = useTravelStore();
+  const { trips, stats, scrapbookMode, user, driveSync } = useTravelStore();
   const navigate = useNavigate();
   const isPhysical = scrapbookMode === 'physical';
+  const [showAuth, setShowAuth] = useState(false);
+  const [showDrive, setShowDrive] = useState(false);
+  const [showStoryGen, setShowStoryGen] = useState(false);
+  const [showNewTrip, setShowNewTrip] = useState(false);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-stone-200 pb-6">
+      {/* Editorial Header & Traveler Welcome Bar */}
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-stone-200/80 pb-6">
         <div>
-          <div className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-amber-100/80 text-amber-900 text-xs font-semibold uppercase tracking-wider mb-2 border border-amber-200/50">
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>Virtual Scrapbook Wall</span>
+          <div className="flex items-center space-x-2 mb-2">
+            <button
+              onClick={() => setShowAuth(true)}
+              className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-amber-100/90 hover:bg-amber-200 text-amber-900 text-xs font-semibold uppercase tracking-wider border border-amber-300/60 shadow-xs transition-colors"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-amber-700" />
+              <span>{user ? `Traveler: ${user.name}` : 'Scrapbook Wall'}</span>
+              {user && (
+                <span className="text-[10px] bg-amber-800 text-amber-100 px-1.5 py-0.2 rounded-full lowercase font-mono">
+                  {user.travelTier}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setShowDrive(true)}
+              className="inline-flex items-center space-x-1.5 px-3 py-1 rounded-full bg-emerald-50 hover:bg-emerald-100 text-emerald-900 text-xs font-semibold border border-emerald-200 shadow-xs transition-colors"
+            >
+              <Cloud className="w-3.5 h-3.5 text-emerald-700" />
+              <span>{driveSync.isConnected ? 'Google Drive Active' : 'Drive Backup'}</span>
+            </button>
           </div>
-          <h1 className="font-serif font-black text-3xl sm:text-5xl text-stone-900 tracking-tight">Your Travel Wall</h1>
-          <p className="text-stone-600 text-sm mt-1 font-serif italic max-w-xl">Pinned memories, routes, and tickets from the places that shaped your story.</p>
+
+          <h1 className="font-serif font-black text-3xl sm:text-5xl text-stone-900 tracking-tight">
+            {user ? `${user.name.split(' ')[0]}'s Travel Wall` : 'Your Travel Wall'}
+          </h1>
+          <p className="text-stone-600 text-sm mt-1 font-serif italic max-w-xl">
+            Pinned memories, routes, and tickets from the places that shaped your story.
+          </p>
         </div>
-        <div className="flex items-center gap-3 text-xs">
-          <Stat emoji="🌍" value={`${stats.countriesCount} Countries`} />
-          <Stat emoji="✈️" value={`${stats.totalDistanceKm.toLocaleString()} km`} />
-          <Stat emoji="📸" value={`${trips.length} Trips`} />
+
+        {/* Stats and Quick Actions */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 text-xs">
+          <div className="flex items-center gap-2">
+            <Stat emoji="🌍" value={`${stats.countriesCount} Countries`} />
+            <Stat emoji="✈️" value={`${stats.totalDistanceKm.toLocaleString()} km`} />
+            <Stat emoji="📸" value={`${trips.length} Trips`} />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowStoryGen(true)}
+              className="px-3.5 py-2 bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white rounded-xl text-xs font-bold shadow-sm transition-all hover:scale-105 flex items-center space-x-1"
+            >
+              <span>✨</span>
+              <span>Make Story</span>
+            </button>
+            <button
+              onClick={() => setShowNewTrip(true)}
+              className="px-3 py-2 bg-stone-900 hover:bg-stone-800 text-white rounded-xl text-xs font-bold shadow transition-all hover:scale-105 flex items-center space-x-1"
+            >
+              <Plus className="w-3.5 h-3.5" />
+              <span>New Trip</span>
+            </button>
+          </div>
         </div>
       </div>
 
@@ -73,6 +126,26 @@ export const HomeWall: React.FC = () => {
           );
         })}
       </div>
+
+      {/* Traveler Profile Modal */}
+      {showAuth && <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />}
+
+      {/* Google Drive Vault Modal */}
+      {showDrive && <DriveBackupModal isOpen={showDrive} onClose={() => setShowDrive(false)} />}
+
+      {/* Story Generator Modal */}
+      {showStoryGen && <StoryGeneratorModal isOpen={showStoryGen} onClose={() => setShowStoryGen(false)} />}
+
+      {/* New Trip Modal */}
+      {showNewTrip && (
+        <NewTripModal
+          onClose={() => setShowNewTrip(false)}
+          onCreated={(newId) => {
+            setShowNewTrip(false);
+            navigate(`/trip/${newId}/canvas`);
+          }}
+        />
+      )}
     </div>
   );
 };

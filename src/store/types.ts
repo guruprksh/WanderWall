@@ -1,5 +1,7 @@
 import { Trip, CanvasItem, TimelineDay, DiaryEntry, DreamTrip, MoodboardItem, PassportStamp, TravelStats, ScrapbookMode } from '../types/travel';
 import { TravelStory, StoryPage, StoryVersionType } from '../types/story';
+import { UserProfile } from '../types/auth';
+import { DriveSyncState, DriveBackupItem, WanderWallFullBackup } from '../types/drive';
 
 export interface TravelStoreState {
   trips: Trip[];
@@ -14,6 +16,24 @@ export interface TravelStoreState {
   scrapbookMode: ScrapbookMode;
   stories: TravelStory[];
   activeStoryId: string | null;
+  
+  // User Auth & Identity
+  user: UserProfile | null;
+  isAuthenticated: boolean;
+  login: (email: string, name?: string, avatar?: string) => void;
+  logout: () => void;
+  updateUserProfile: (updates: Partial<UserProfile>) => void;
+
+  // Google Drive & Cloud Backup
+  driveSync: DriveSyncState;
+  connectDrive: (email: string) => Promise<boolean>;
+  disconnectDrive: () => void;
+  triggerDriveBackup: () => Promise<DriveBackupItem | null>;
+  restoreDriveBackup: (driveFileId: string) => Promise<boolean>;
+  deleteDriveBackup: (driveFileId: string) => Promise<boolean>;
+  toggleAutoBackup: (enabled: boolean) => void;
+  importFullBackupPayload: (payload: WanderWallFullBackup) => boolean;
+
   setScrapbookMode: (mode: ScrapbookMode) => void;
   setActiveTripId: (id: string | null) => void;
   setActiveStoryId: (id: string | null) => void;

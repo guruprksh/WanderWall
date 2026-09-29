@@ -11,18 +11,23 @@ import {
   Scroll, 
   Layers,
   Sparkle,
-  Library
+  Library,
+  Cloud
 } from 'lucide-react';
 import { useTravelStore } from '../../store/travelStore';
 import { AIAssistantModal } from '../ai/AIAssistantModal';
 import { NewTripModal } from '../modals/NewTripModal';
 import { StoryGeneratorModal } from '../story/StoryGeneratorModal';
+import { AuthModal } from '../auth/AuthModal';
+import { DriveBackupModal } from '../drive/DriveBackupModal';
 
 export const Navbar: React.FC = () => {
-  const { scrapbookMode, setScrapbookMode } = useTravelStore();
+  const { scrapbookMode, setScrapbookMode, user, driveSync } = useTravelStore();
   const [showAI, setShowAI] = useState(false);
   const [showNewTrip, setShowNewTrip] = useState(false);
   const [showStoryGen, setShowStoryGen] = useState(false);
+  const [showAuth, setShowAuth] = useState(false);
+  const [showDrive, setShowDrive] = useState(false);
   const navigate = useNavigate();
 
   const navLinks = [
@@ -120,6 +125,37 @@ export const Navbar: React.FC = () => {
                 <span className="hidden sm:inline font-sans">AI Chat</span>
               </button>
 
+              {/* Google Drive Cloud Backup Button */}
+              <button
+                onClick={() => setShowDrive(true)}
+                className="flex items-center space-x-1.5 px-2.5 py-1.5 bg-white/80 hover:bg-emerald-50 text-stone-700 hover:text-emerald-900 rounded-full text-xs font-medium border border-stone-200 hover:border-emerald-300 transition-all shadow-sm group"
+                title="Google Drive Cloud Vault & Auto-Backup"
+              >
+                <Cloud className={`w-3.5 h-3.5 ${driveSync.isConnected ? 'text-emerald-600' : 'text-stone-400'}`} />
+                <span className="hidden xl:inline font-sans text-[11px]">
+                  {driveSync.isConnected ? 'Drive Synced' : 'Drive'}
+                </span>
+                {driveSync.isConnected && (
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse hidden xl:inline-block" />
+                )}
+              </button>
+
+              {/* Individual Traveler Profile Button */}
+              <button
+                onClick={() => setShowAuth(true)}
+                className="flex items-center space-x-1.5 p-1 sm:px-2.5 sm:py-1 bg-amber-50 hover:bg-amber-100/80 text-stone-800 rounded-full text-xs font-medium border border-amber-200/80 transition-all shadow-sm group"
+                title="Traveler Profile & Passport"
+              >
+                <img
+                  src={user?.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80'}
+                  alt="Traveler"
+                  className="w-5 h-5 rounded-full object-cover border border-amber-600/40"
+                />
+                <span className="hidden lg:inline text-[11px] font-semibold text-amber-950 max-w-[85px] truncate">
+                  {user?.name?.split(' ')[0] || 'Passport'}
+                </span>
+              </button>
+
               {/* New Trip Button */}
               <button
                 onClick={() => setShowNewTrip(true)}
@@ -133,6 +169,12 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       </header>
+
+      {/* Traveler Profile Modal */}
+      {showAuth && <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} />}
+
+      {/* Google Drive Vault Modal */}
+      {showDrive && <DriveBackupModal isOpen={showDrive} onClose={() => setShowDrive(false)} />}
 
       {/* AI Assistant Modal */}
       {showAI && <AIAssistantModal onClose={() => setShowAI(false)} />}

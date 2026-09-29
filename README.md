@@ -37,6 +37,18 @@
 - **8-Slide Instagram Carousel**: Instant export for Instagram Posts (4:5), Stories (9:16), or Square (1:1).
 - **Printable Physical Book**: Prepares digital books for physical printing (A4, A5, Square) with 3mm bleed guides and 15mm binding gutters.
 
+### ☁️ 4. Google Drive Cloud Backup Plugin & Vault
+- **Continuous Cloud Sync**: Keep all trips, diary entries, stories, canvas layouts, and passport stamps securely backed up.
+- **Point-in-Time Snapshot Recovery**: View cloud snapshot history with file sizes, timestamps, and one-click rollback/restore.
+- **Auto-Sync Engine**: Silently backs up state whenever new journeys or stories are created.
+- **Offline Data Portability**: Export and import full `.json` workspace bundles for complete local ownership.
+
+### 🛂 5. Traveler Identity & Passport Portal
+- **Personalized Travel ID**: Individual traveler profiles with home base, bio, and member credentials.
+- **Explorer Ranks**: Progress from *Explorer* to *Voyager*, *Globetrotter*, and *Wanderer*.
+- **Avatar Studio**: Choose and switch traveler avatars.
+- **Editorial Luxury Aesthetic**: Vintage film grain texture, warm parchment palette, pushpins, and washi tape detailing.
+
 ---
 
 ## 🚀 Getting Started
